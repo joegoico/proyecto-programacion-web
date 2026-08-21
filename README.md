@@ -87,3 +87,4 @@ Para detener y eliminar el contenedor en cualquier momento, ejecuta:
 ```bash
 docker stop servidor-notas-app && docker rm servidor-notas-app
 ```
+> **Nota para Linux:** Si tu usuario no tiene permisos en el grupo de Docker (`permission denied unix:///var/run/docker.sock`), ejecuta el script con `sudo ./run.sh` o agrega tu usuario al grupo docker con `sudo usermod -aG docker $USER && newgrp docker`.
