@@ -55,35 +55,54 @@ Etiqueta temática utilizada para clasificar y filtrar las notas.
 
 ### Requisitos Previos
 * [Docker](https://docs.docker.com/get-docker/) instalado y en ejecución en el sistema.
+* [Go](https://golang.org/doc/install) instalado (para la ejecución de los tests locales).
 
 ---
 
 ### Paso a Paso
 
-1. **Clonar o ubicarse en la raíz del repositorio:**
+1. **Clonar el repositorio:**
    ```bash
+   git clone <URL_DEL_REPOSITORIO>
    cd proyecto-programacion-web
    ```
 
-2. **Otorgar permisos de ejecución al script (solo la primera vez si es necesario):**
+2. **Configurar Variables de Entorno:**
+   Debes crear un archivo `.env` en la raíz del proyecto para definir los datos de conexión a la base de datos de pruebas (la cual será ignorada por git). Puedes usar el siguiente template:
+   ```env
+   TEST_DB_USER=testuser
+   TEST_DB_PASSWORD=testpassword
+   TEST_DB_NAME=notas_db_test
+   TEST_DB_PORT=5433
+   ```
+
+3. **Otorgar permisos de ejecución al script:**
    ```bash
    chmod +x run.sh
    ```
 
-3. **Ejecutar la aplicación:**
+4. **Ejecutar tests y levantar la aplicación:**
+   Ejecuta el script orquestador. El mismo se encargará automáticamente de:
+   - Cargar tu `.env`.
+   - Generar el código a nivel de base de datos usando `sqlc`.
+   - Levantar una base de datos PostgreSQL de pruebas usando contenedores de Docker.
+   - **Correr todos los tests automatizados** de CRUD (usando el paquete estandar `testing` de Go).
+   - Eliminar los contenedores y volúmenes de pruebas post-ejecución.
+   - Construir y levantar el servidor principal para la aplicación real.
+
    ```bash
    ./run.sh
    ```
 
-4. **Acceder a la aplicación:**
-   Abre tu navegador web e ingresa a:
+5. **Acceder a la aplicación:**
+   Si los tests pasan exitosamente, abre tu navegador web e ingresa a:
    👉 **[http://localhost:8080](http://localhost:8080)**
 
 ---
 
 ### 🛑 Detener el Contenedor
 
-Para detener y eliminar el contenedor en cualquier momento, ejecuta:
+Para detener y eliminar el contenedor de la aplicación en cualquier momento, ejecuta:
 ```bash
-docker stop servidor-notas-app && docker rm servidor-notas-app
+docker stop gestor-notas-app && docker rm gestor-notas-app
 ```

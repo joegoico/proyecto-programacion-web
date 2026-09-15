@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "backend/sql/schema.sql"
+    queries: "backend/sql/queries.sql"
+    gen:
+      go:
+        package: "db"
+        out: "backend/db"
+        emit_json_tags: true
