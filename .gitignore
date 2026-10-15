@@ -1,1 +1,5 @@
 .env
+.env
+tmp/
+server
+build-errors.log

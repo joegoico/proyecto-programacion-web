@@ -1,8 +1,7 @@
 -- name: CreateCategoria :one
 INSERT INTO
     categoria (nombre, descripcion)
-VALUES ($1, $2) RETURNING nombre,
-    descripcion;
+VALUES ($1, $2) RETURNING *;
 
 -- name: GetCategoria :one
 SELECT * FROM categoria WHERE id_categoria = $1 LIMIT 1;
@@ -28,9 +27,7 @@ INSERT INTO
         contenido,
         is_archived
     )
-VALUES ($1, $2, $3) RETURNING titulo,
-    contenido,
-    is_archived;
+VALUES ($1, $2, $3) RETURNING *;
 
 -- name: GetNota :one
 SELECT * FROM nota WHERE id_nota = $1 LIMIT 1;

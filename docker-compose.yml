@@ -1,7 +1,36 @@
 services:
   app:
-    build: .
+    image: golang:1.26-alpine
     container_name: gestor-notas-app
     ports:
       - "8080:8080"
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/notas_db?sslmode=disable
+    command: sh -c "go install github.com/air-verse/air@latest && air"
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
+
+  db:
+    image: postgres:15
+    container_name: gestor-notas-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: notas_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d notas_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

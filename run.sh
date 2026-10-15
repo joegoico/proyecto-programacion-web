@@ -8,6 +8,7 @@ if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
+export TEST_DB_USER="${TEST_DB_USER:-testuser}" TEST_DB_PASSWORD="${TEST_DB_PASSWORD:-testpassword}" TEST_DB_NAME="${TEST_DB_NAME:-notas_db_test}" TEST_DB_PORT="${TEST_DB_PORT:-5433}"
 IMAGE_NAME="notas-servidor-go"
 CONTAINER_NAME="gestor-notas-app"
 PORT="8080"
@@ -56,22 +57,20 @@ echo " Tests superados! Levantando servidor...  "
 echo "=========================================="
 
 # 5. Detener y remover contenedor previo si ya estaba corriendo
-if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
-    echo "-> Limpiando contenedor de app previo..."
-    docker rm -f ${CONTAINER_NAME} > /dev/null 2>&1
+echo "-> Limpiando contenedores de app previos..."
+if [ "$(docker ps -aq -f name=^gestor-notas-app$)" ]; then
+    docker rm -f gestor-notas-app > /dev/null 2>&1
 fi
+docker compose down -v
 
-# 6. Construir la imagen Docker de la app
-echo "-> Construyendo la imagen de la app..."
-docker build -t ${IMAGE_NAME} .
-
-# 7. Iniciar el contenedor
-echo "-> Iniciando contenedor en el puerto ${PORT}..."
-docker run -d -p ${PORT}:${PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}
+# 6. Levantar la aplicación con docker-compose
+echo "-> Construyendo e iniciando contenedores de la app y base de datos..."
+docker compose up -d --build
 
 echo "=========================================="
-echo " ¡Servidor corriendo exitosamente!"
+echo " ¡Servidor y DB corriendo exitosamente!"
 echo " Abrir en el navegador: http://localhost:${PORT}"
+echo " La API responderá en: http://localhost:${PORT}/api/categorias"
 echo "=========================================="
 echo "-> Mostrando logs del servidor (Ctrl+C para salir de los logs):"
-docker logs -f ${CONTAINER_NAME}
+docker compose logs -f app

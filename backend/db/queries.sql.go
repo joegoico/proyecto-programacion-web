@@ -52,8 +52,7 @@ func (q *Queries) AssignCategoriaToNota(ctx context.Context, arg AssignCategoria
 const createCategoria = `-- name: CreateCategoria :one
 INSERT INTO
     categoria (nombre, descripcion)
-VALUES ($1, $2) RETURNING nombre,
-    descripcion
+VALUES ($1, $2) RETURNING id_categoria, nombre, descripcion
 `
 
 type CreateCategoriaParams struct {
@@ -61,15 +60,10 @@ type CreateCategoriaParams struct {
 	Descripcion sql.NullString `json:"descripcion"`
 }
 
-type CreateCategoriaRow struct {
-	Nombre      string         `json:"nombre"`
-	Descripcion sql.NullString `json:"descripcion"`
-}
-
-func (q *Queries) CreateCategoria(ctx context.Context, arg CreateCategoriaParams) (CreateCategoriaRow, error) {
+func (q *Queries) CreateCategoria(ctx context.Context, arg CreateCategoriaParams) (Categorium, error) {
 	row := q.db.QueryRowContext(ctx, createCategoria, arg.Nombre, arg.Descripcion)
-	var i CreateCategoriaRow
-	err := row.Scan(&i.Nombre, &i.Descripcion)
+	var i Categorium
+	err := row.Scan(&i.IDCategoria, &i.Nombre, &i.Descripcion)
 	return i, err
 }
 
@@ -80,9 +74,7 @@ INSERT INTO
         contenido,
         is_archived
     )
-VALUES ($1, $2, $3) RETURNING titulo,
-    contenido,
-    is_archived
+VALUES ($1, $2, $3) RETURNING id_nota, titulo, contenido, completed, created_at, is_archived
 `
 
 type CreateNotaParams struct {
@@ -91,16 +83,17 @@ type CreateNotaParams struct {
 	IsArchived bool           `json:"is_archived"`
 }
 
-type CreateNotaRow struct {
-	Titulo     string         `json:"titulo"`
-	Contenido  sql.NullString `json:"contenido"`
-	IsArchived bool           `json:"is_archived"`
-}
-
-func (q *Queries) CreateNota(ctx context.Context, arg CreateNotaParams) (CreateNotaRow, error) {
+func (q *Queries) CreateNota(ctx context.Context, arg CreateNotaParams) (Notum, error) {
 	row := q.db.QueryRowContext(ctx, createNota, arg.Titulo, arg.Contenido, arg.IsArchived)
-	var i CreateNotaRow
-	err := row.Scan(&i.Titulo, &i.Contenido, &i.IsArchived)
+	var i Notum
+	err := row.Scan(
+		&i.IDNota,
+		&i.Titulo,
+		&i.Contenido,
+		&i.Completed,
+		&i.CreatedAt,
+		&i.IsArchived,
+	)
 	return i, err
 }
 
