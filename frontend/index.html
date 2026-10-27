@@ -2,10 +2,45 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Presentación - App de Notas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>App de Notas</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <h1>Aplicación de Gestión de Notas Personales</h1>
-    <p>Esta aplicación permite crear, organizar y clasificar notas personales mediante categorías, facilitando su filtrado y la gestión de notas activas y archivadas.</p>
+
+    <section id="categorias">
+        <div class="barra">
+            <ul id="lista-categorias" class="chips"></ul>
+            <button id="btn-agregar-categoria" type="button">Agregar categoría</button>
+        </div>
+        <form id="categoria-form" class="inline" hidden>
+            <input id="nombre" name="nombre" placeholder="Nombre de la categoría" required>
+            <button type="submit">Guardar</button>
+        </form>
+    </section>
+
+    <main>
+        <div class="col-form">
+            <button id="btn-agregar-nota" type="button">Agregar nota</button>
+            <form id="nota-form" hidden>
+                <h2>Nueva nota</h2>
+                <input id="titulo" placeholder="Título" required>
+                <textarea id="contenido" placeholder="Contenido" rows="4"></textarea>
+                <fieldset>
+                    <legend>Categorías</legend>
+                    <div id="categorias-select"></div>
+                </fieldset>
+                <button type="submit">Crear</button>
+            </form>
+        </div>
+        <section>
+            <h2>Notas</h2>
+            <ul id="lista-notas"></ul>
+        </section>
+    </main>
+    <script src="/app.js" defer></script>
 </body>
+</html>
+
 </html>

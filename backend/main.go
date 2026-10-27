@@ -37,6 +37,14 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	// Archivos estáticos del frontend
+	mux.HandleFunc("GET /app.js", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "frontend/app.js")
+	})
+	mux.HandleFunc("GET /styles.css", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "frontend/styles.css")
+	})
+
 	// Handler para el frontend
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {

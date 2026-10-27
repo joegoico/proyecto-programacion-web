@@ -188,10 +188,10 @@ Ruta base: `http://localhost:8080/api`. Las respuestas con datos son JSON.
 
 | Método | Ruta | Body (JSON) | Respuestas |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/notas` | `{"titulo":"...","contenido":"...","is_archived":false}` | `201` con la nota creada · `400` si el título está vacío o el JSON es inválido |
-| `GET` | `/api/notas` | – | `200` con un array |
+| `POST` | `/api/notas` | `{"titulo":"...","contenido":"...","is_archived":false,"categorias":[1,2]}` | `201` con la nota creada · `400` si el título está vacío o el JSON es inválido |
+| `GET` | `/api/notas` | – | `200` con un array; cada nota incluye su arreglo `categorias` |
 | `GET` | `/api/notas/{id}` | – | `200` · `400` id inválido · `404` no existe |
-| `PUT` | `/api/notas/{id}` | `{"titulo":"...","contenido":"...","is_archived":true}` | `200` · `400` · `404` |
+| `PUT` | `/api/notas/{id}` | `{"titulo":"...","contenido":"...","is_archived":true,"categorias":[1]}` | `200` · `400` · `404`. `categorias` es opcional: si se omite se conservan; si se envía reemplaza el conjunto |
 | `DELETE` | `/api/notas/{id}` | – | `204` · `400` |
 
 Ejemplo manual:
@@ -204,6 +204,24 @@ curl -X POST http://localhost:8080/api/categorias \
 
 ---
 
+## 🖥️ Interfaz de usuario (TP4)
+
+Con la app corriendo (`docker compose up -d` o `./run.sh`), abrir http://localhost:8080. El servidor Go sirve `index.html`, `app.js` y `styles.css` desde `frontend/`.
+
+- **Categorías:** se muestran como chips arriba. El botón *Agregar categoría* despliega su formulario. Cada chip tiene ✎ (editar) y × (eliminar).
+- **Notas:** el botón *Agregar nota* despliega el formulario, donde se eligen una o más categorías con checkboxes. Cada nota muestra sus categorías y tiene botones *Editar* y *Eliminar* (delegación de eventos).
+- Al crear, editar o borrar, la vista se refresca pidiendo de nuevo la lista a la API. Renombrar o borrar una categoría actualiza también las notas.
+
+### Tests del frontend
+
+```bash
+node --test frontend/
+```
+
+Usan el runner de Node (sin dependencias) con un DOM y `fetch` simulados. Los tests de Go (`go test ./tests/...`) cubren además la asociación nota-categoría.
+
+---
+
 ## Estructura del proyecto
 
 ```
@@ -213,7 +231,7 @@ curl -X POST http://localhost:8080/api/categorias \
 │   ├── handlers/           # Capa de lógica de negocio: handlers HTTP CRUD (categorias.go, notas.go)
 │   ├── db/                 # Código generado por sqlc (NO editar a mano)
 │   └── sql/                # schema.sql y queries.sql (fuente para sqlc)
-├── frontend/               # Interfaz web
+├── frontend/               # Interfaz web: index.html, app.js, styles.css, app.test.js
 ├── tests/                  # Tests de Go de la capa de datos y de los handlers
 ├── sqlc.yaml               # Configuración de sqlc
 ├── docker-compose.yml      # App (con air) + PostgreSQL
