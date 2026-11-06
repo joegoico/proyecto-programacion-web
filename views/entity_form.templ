@@ -1,0 +1,22 @@
+package views
+
+import "proyecto-programacion-web/backend/db"
+
+// EntityForm renderiza el formulario de notas: de creación si edit es nil,
+// o de edición precargado con la nota y sus categorías seleccionadas.
+templ EntityForm(categorias []db.Categorium, edit *db.Notum, seleccionadas []db.Categorium) {
+	<form id="nota-form" action={ templ.SafeURL(notaAction(edit)) } method="POST">
+		<h2>Nueva nota</h2>
+		<input id="titulo" name="titulo" placeholder="Título" value={ notaTitulo(edit) } required/>
+		<textarea id="contenido" name="contenido" placeholder="Contenido" rows="4">{ notaContenido(edit) }</textarea>
+		<fieldset>
+			<legend>Categorías</legend>
+			<div id="categorias-select">
+				for _, c := range categorias {
+					<label><input type="checkbox" name="categorias" value={ idStr(c.IDCategoria) } checked?={ estaSeleccionada(seleccionadas, c.IDCategoria) }/><span>{ c.Nombre }</span></label>
+				}
+			</div>
+		</fieldset>
+		<button type="submit">Crear</button>
+	</form>
+}

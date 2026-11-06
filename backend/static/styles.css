@@ -29,3 +29,6 @@ fieldset label { display: inline-flex; align-items: center; gap: .3rem; margin-r
 .chips .chip { display: inline-flex; align-items: center; gap: .3rem; }
 .chip button { padding: 0 .3rem; background: transparent; color: inherit; font-size: .9rem; }
 .chip button:hover { background: rgba(0,0,0,.1); }
+
+/* TP5: los botones de acción son <form method=GET/POST> reales; no deben añadir caja propia */
+form.accion { display: contents; }

@@ -1,5 +1,9 @@
 module proyecto-programacion-web
 
-go 1.26.5
+go 1.22
 
-require github.com/lib/pq v1.12.3
+require (
+	github.com/a-h/templ v0.2.793
+	github.com/lib/pq v1.10.9
+)
+

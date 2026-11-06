@@ -1,5 +1,7 @@
 .env
-.env
 tmp/
 server
 build-errors.log
+
+# Código generado por sqlc
+backend/db/

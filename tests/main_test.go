@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	_ "github.com/lib/pq"
 	"proyecto-programacion-web/backend/db"
@@ -15,6 +16,8 @@ var testQueries *db.Queries
 var testDB *sql.DB
 
 func TestMain(m *testing.M) {
+	dbHost := os.Getenv("TEST_DB_HOST")
+	if dbHost == "" { dbHost = "localhost" }
 	dbUser := os.Getenv("TEST_DB_USER")
 	dbPass := os.Getenv("TEST_DB_PASSWORD")
 	dbName := os.Getenv("TEST_DB_NAME")
@@ -25,7 +28,7 @@ func TestMain(m *testing.M) {
 	if dbName == "" { dbName = "notas_db_test" }
 	if dbPort == "" { dbPort = "5433" }
 
-	connStr := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable", dbUser, dbPass, dbPort, dbName)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbPort, dbName)
 	
 	var err error
 	testDB, err = sql.Open("postgres", connStr)
@@ -33,6 +36,18 @@ func TestMain(m *testing.M) {
 		log.Fatalf("No se pudo conectar a la DB de test: %v", err)
 	}
 	defer testDB.Close()
+
+	// Esperar activamente con ping a que Postgres esté listo para recibir queries
+	for i := 0; i < 10; i++ {
+		err = testDB.Ping()
+		if err == nil {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	if err != nil {
+		log.Fatalf("Error al hacer ping a la base de datos de test: %v", err)
+	}
 
 	testQueries = db.New(testDB)
 

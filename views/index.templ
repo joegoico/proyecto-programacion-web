@@ -1,0 +1,36 @@
+package views
+
+// toggleButton reemplaza al botón "Agregar ..." del TP4: en lugar de alternar
+// un atributo hidden con JS, navega a /?param=nueva (abre) o a / (cierra).
+templ toggleButton(param string, id string, texto string, abierto bool) {
+	<form action="/" method="GET" class="accion">
+		if !abierto {
+			<input type="hidden" name={ param } value="nueva"/>
+		}
+		<button id={ id } type="submit">{ texto }</button>
+	</form>
+}
+
+templ IndexPage(data IndexData) {
+	@Layout("App de Notas") {
+		<h1>Aplicación de Gestión de Notas Personales</h1>
+		<section id="categorias">
+			<div class="barra">
+				@CategoriaList(data.Categorias)
+				@toggleButton("categoria", "btn-agregar-categoria", "Agregar categoría", data.CategoriaAbierta)
+			</div>
+			if data.CategoriaAbierta {
+				@CategoriaForm(data.CategoriaEditando)
+			}
+		</section>
+		<main>
+			<div class="col-form">
+				@toggleButton("nota", "btn-agregar-nota", "Agregar nota", data.NotaAbierta)
+				if data.NotaAbierta {
+					@EntityForm(data.Categorias, data.NotaEditando, data.seleccionadas())
+				}
+			</div>
+			@EntityList(data.Notas, data.CategoriasPorNota)
+		</main>
+	}
+}

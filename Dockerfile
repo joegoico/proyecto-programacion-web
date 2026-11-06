@@ -1,15 +1,20 @@
 # Etapa 1: Build del binario
-FROM golang:1.26-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Copiamos solo el código fuente del backend para compilar
+# Instalamos templ para compilar las vistas
+RUN go install github.com/a-h/templ/cmd/templ@v0.2.793
+
+# Copiamos código fuente
+COPY views/ ./views/
 COPY backend/ ./backend/
 
-# Compilamos el binario de forma estática
+# Generamos las vistas y compilamos de forma estática
+RUN templ generate
 RUN CGO_ENABLED=0 GOOS=linux go build -o server ./backend
 
 # Etapa 2: Imagen final minimalista
@@ -19,9 +24,6 @@ WORKDIR /app
 
 # Copiamos el ejecutable desde la etapa builder
 COPY --from=builder /app/server .
-
-# Copiamos la carpeta frontend directamente desde el contexto raíz
-COPY frontend/ ./frontend/
 
 EXPOSE 8080
 

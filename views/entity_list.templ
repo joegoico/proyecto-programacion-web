@@ -1,0 +1,31 @@
+package views
+
+import "proyecto-programacion-web/backend/db"
+
+templ EntityList(notas []db.Notum, categoriasPorNota map[int32][]db.Categorium) {
+	<section>
+		<h2>Notas</h2>
+		<ul id="lista-notas">
+			for _, nota := range notas {
+				<li>
+					<div>
+						<strong>{ nota.Titulo }</strong>
+						<p>{ nota.Contenido.String }</p>
+						for _, c := range categoriasPorNota[nota.IDNota] {
+							<span class="chip">{ c.Nombre }</span>
+						}
+					</div>
+					<div class="acciones">
+						<form action="/" method="GET" class="accion">
+							<input type="hidden" name="nota" value={ idStr(nota.IDNota) }/>
+							<button type="submit" class="editar">Editar</button>
+						</form>
+						<form action={ templ.SafeURL("/notas/" + idStr(nota.IDNota) + "/eliminar") } method="POST" class="accion">
+							<button type="submit" class="eliminar">Eliminar</button>
+						</form>
+					</div>
+				</li>
+			}
+		</ul>
+	</section>
+}

@@ -32,47 +32,21 @@ func main() {
 
 	// Instanciar repositorio y handlers
 	queries := db.New(dbConn)
-	categoriaHandler := &handlers.CategoriaHandler{Queries: queries}
-	notaHandler := &handlers.NotaHandler{Queries: queries}
+	webHandler := handlers.NewWebHandler(queries)
 
 	mux := http.NewServeMux()
 
-	// Archivos estáticos del frontend
-	mux.HandleFunc("GET /app.js", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "frontend/app.js")
-	})
-	mux.HandleFunc("GET /styles.css", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "frontend/styles.css")
-	})
+	// Hoja de estilos embebida
+	mux.HandleFunc("GET /styles.css", handlers.Styles)
 
-	// Handler para el frontend
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		content, err := os.ReadFile("frontend/index.html")
-		if err != nil {
-			http.Error(w, "Error al cargar el archivo HTML", http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Write(content)
-	})
-
-	// Rutas API para Categorías
-	mux.HandleFunc("GET /api/categorias", categoriaHandler.List)
-	mux.HandleFunc("GET /api/categorias/{id}", categoriaHandler.Get)
-	mux.HandleFunc("POST /api/categorias", categoriaHandler.Create)
-	mux.HandleFunc("PUT /api/categorias/{id}", categoriaHandler.Update)
-	mux.HandleFunc("DELETE /api/categorias/{id}", categoriaHandler.Delete)
-
-	// Rutas API para Notas
-	mux.HandleFunc("GET /api/notas", notaHandler.List)
-	mux.HandleFunc("GET /api/notas/{id}", notaHandler.Get)
-	mux.HandleFunc("POST /api/notas", notaHandler.Create)
-	mux.HandleFunc("PUT /api/notas/{id}", notaHandler.Update)
-	mux.HandleFunc("DELETE /api/notas/{id}", notaHandler.Delete)
+	// Rutas web SSR y formularios clásicos (Patrón PRG)
+	mux.HandleFunc("GET /", webHandler.HandleIndex)
+	mux.HandleFunc("POST /notas", webHandler.HandleCreateNota)
+	mux.HandleFunc("POST /notas/{id}/editar", webHandler.HandleUpdateNota)
+	mux.HandleFunc("POST /notas/{id}/eliminar", webHandler.HandleDeleteNota)
+	mux.HandleFunc("POST /categorias", webHandler.HandleCreateCategoria)
+	mux.HandleFunc("POST /categorias/{id}/editar", webHandler.HandleUpdateCategoria)
+	mux.HandleFunc("POST /categorias/{id}/eliminar", webHandler.HandleDeleteCategoria)
 
 	port := os.Getenv("PORT")
 	if port == "" {

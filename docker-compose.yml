@@ -1,15 +1,11 @@
 services:
   app:
-    image: golang:1.26-alpine
+    build: .
     container_name: gestor-notas-app
     ports:
       - "8080:8080"
-    volumes:
-      - .:/app
-    working_dir: /app
     environment:
       - DATABASE_URL=postgres://user:password@db:5432/notas_db?sslmode=disable
-    command: sh -c "go install github.com/air-verse/air@latest && air"
     depends_on:
       db:
         condition: service_healthy
@@ -18,6 +14,8 @@ services:
   db:
     image: postgres:15
     container_name: gestor-notas-db
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password

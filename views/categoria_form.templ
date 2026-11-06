@@ -1,0 +1,11 @@
+package views
+
+import "proyecto-programacion-web/backend/db"
+
+// CategoriaForm renderiza el formulario en línea de categorías (creación o edición).
+templ CategoriaForm(edit *db.Categorium) {
+	<form id="categoria-form" action={ templ.SafeURL(categoriaAction(edit)) } method="POST" class="inline">
+		<input id="nombre" name="nombre" placeholder="Nombre de la categoría" value={ categoriaNombre(edit) } required/>
+		<button type="submit">Guardar</button>
+	</form>
+}

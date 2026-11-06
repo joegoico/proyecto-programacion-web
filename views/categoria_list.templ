@@ -1,0 +1,20 @@
+package views
+
+import "proyecto-programacion-web/backend/db"
+
+templ CategoriaList(categorias []db.Categorium) {
+	<ul id="lista-categorias" class="chips">
+		for _, c := range categorias {
+			<li class="chip">
+				<span>{ c.Nombre }</span>
+				<form action="/" method="GET" class="accion">
+					<input type="hidden" name="categoria" value={ idStr(c.IDCategoria) }/>
+					<button type="submit" class="editar-cat">✎</button>
+				</form>
+				<form action={ templ.SafeURL("/categorias/" + idStr(c.IDCategoria) + "/eliminar") } method="POST" class="accion">
+					<button type="submit" class="eliminar-cat">×</button>
+				</form>
+			</li>
+		}
+	</ul>
+}
